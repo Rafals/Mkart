@@ -1,13 +1,11 @@
 package pl.mkart.controller;
 
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import pl.mkart.Main;
+import pl.mkart.MKartApplication.Main;
 
 public class LoginController {
 
