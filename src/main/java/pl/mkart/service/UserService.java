@@ -1,50 +1,45 @@
 package pl.mkart.service;
 
+import javafx.application.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.mkart.model.Role;
 import pl.mkart.model.User;
 import pl.mkart.repository.UserRepository;
 
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private MailService mailService;
+    private JavaMailSender mailSender;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder encoder;
 
-    public boolean registerUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return false; // użytkownik już istnieje
-        }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActivationCode(UUID.randomUUID().toString());
-        user.setActive(false);
 
-        userRepository.save(user);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        System.out.println("In the user details service.");
+        if (!username.equals("admin")) throw new UsernameNotFoundException(username);
 
-        mailService.sendActivationEmail(user.getEmail(), user.getActivationCode());
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(new Role(1, "USER"));
 
-        return true;
-    }
-
-    public boolean activateUser(String code) {
-        Optional<User> userOptional = userRepository.findByActivationCode(code);
-        if (userOptional.isEmpty()) return false;
-
-        User user = userOptional.get();
-        user.setActive(true);
-        user.setActivationCode(null);
-        userRepository.save(user);
-
-        return true;
+        return new User(1, "admin", encoder.encode("admin"), roles);
     }
 }

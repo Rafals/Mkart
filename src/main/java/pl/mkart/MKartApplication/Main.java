@@ -16,7 +16,7 @@ import java.io.IOException;
 @SpringBootApplication
 public class Main extends Application {
 
-    private static Stage primaryStage;
+    public static Stage primaryStage;
     private static ConfigurableApplicationContext springContext;
 
     public static void main(String[] args) {
@@ -27,6 +27,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // Ustawiamy primaryStage tylko w momencie startu
         primaryStage = stage;
 
         // Inicjalizacja JavaFX
@@ -65,4 +66,16 @@ public class Main extends Application {
             springContext.close();
         }
     }
+
+    public static void showDashboardView() throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/DashboardView.fxml"));
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
 }

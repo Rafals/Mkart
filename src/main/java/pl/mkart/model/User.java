@@ -1,81 +1,102 @@
 package pl.mkart.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name="users")
+public class User implements UserDetails {
 
-    @Column(unique = true, nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name="user_id")
+    private Integer userId;
+
     private String username;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
     private String password;
-    private boolean active;
-    private String activationCode;
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Long getId() {
-        return id;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="user_role_junction",
+            joinColumns = {@JoinColumn(name="user_id")},
+            inverseJoinColumns = {@JoinColumn(name="role_id")}
+    )
+
+    private Set<Role> authorities;
+
+    public User() {
+        super();
+        this.authorities = new HashSet<Role>();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
+    public User(Integer userId, String username, String password, Set<Role> authorities) {
+        super();
+        this.userId = userId;
         this.username = username;
+        this.password = password;
+        this.authorities = authorities;
     }
 
-    public String getEmail() {
-        return email;
+    public Integer getUserId() {
+        return this.userId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
+    }
+
+    public void setAuthorities(Set<Role> authorities) {
+        this.authorities = authorities;
+    }
+
+    @Override
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public String getActivationCode() {
-        return activationCode;
+    @Override
+    public String getUsername() {
+        return this.username;
     }
 
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    // getters & setters
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
