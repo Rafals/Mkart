@@ -1,17 +1,23 @@
 package pl.mkart.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
-import pl.mkart.MKartApplication.Main;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import pl.mkart.Main;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 
 public class LoginController {
@@ -25,7 +31,7 @@ public class LoginController {
     @FXML
     private Label errorLabel;
 
-    private static final String LOGIN_URL = "http://localhost:8080/auth/login"; // URL do logowania w backendzie
+    private static final String LOGIN_URL = "http://localhost:8000/auth/login"; // URL do logowania w backendzie
 
     @FXML
     private void handleLogin() {
@@ -49,11 +55,17 @@ public class LoginController {
 
         // Tworzymy dane do wysłania w żądaniu (np. JSON)
         String json = String.format("{\"email\":\"%s\", \"password\":\"%s\"}", email, password);
+        System.out.println(json);
+
+        String basicAuth = "Basic " + Base64.getEncoder()
+                .encodeToString((email + ":" + password).getBytes());
 
         // Tworzymy zapytanie HTTP
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(LOGIN_URL))
                 .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("Authorization", basicAuth)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
@@ -64,9 +76,10 @@ public class LoginController {
                         // Jeśli logowanie jest udane, przechodzimy do dashboardu
                         Platform.runLater(() -> {
                             errorLabel.setVisible(false);
-                            goToDashboard();
+                            handleLogout();
                         });
                     } else {
+                        System.out.println(response.statusCode());
                         System.out.println("login: " + email);
                         System.out.println("password: " + password);
                         // W przypadku błędu logowania wyświetlamy komunikat
@@ -78,21 +91,24 @@ public class LoginController {
                 });
     }
 
-    // Funkcja do przejścia do dashboardu po zalogowaniu
-    private void goToDashboard() {
-        try {
-            // Upewnij się, że 'primaryStage' jest już zainicjowane przed wywołaniem showDashboardView()
-            if (Main.primaryStage != null) {
-                Main.showDashboardView();
-                System.out.println("Zalogowano pomyślnie! Przechodzimy do dashboardu.");
-            } else {
-                System.out.println("primaryStage is null, unable to switch to dashboard.");
-            }
+    //                                              FXML
+    private Stage stage;
+
+    // Ustawiany z Main.java po załadowaniu FXML
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+    @FXML
+    private void handleLogout() {
+        try{
+            if (stage != null) {
+                Main.showStartView(stage);
+            } else System.out.println("stage is null");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     @FXML
     private void closeApp() {
@@ -102,9 +118,14 @@ public class LoginController {
     @FXML
     private void goBackApp() {
         try {
-            Main.showStartView();
-        } catch (Exception e) {
+            if (stage != null) {
+                Main.showStartView(stage); // ← przekazujemy dalej ten sam stage
+            } else {
+                System.out.println("Stage is null!");
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package pl.mkart.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,17 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        boolean loggedIn = userService.loadUserByUsername(loginRequest.getEmail()) != null;
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest servletRequest) {
+        System.out.println("HEADERS:");
+        servletRequest.getHeaderNames().asIterator().forEachRemaining(header ->
+                System.out.println(header + ": " + servletRequest.getHeader(header))
+        );
+
+        System.out.println("BODY:");
+        System.out.println(request.getEmail() + " / " + request.getPassword());
+
+        boolean loggedIn = userService.loadUserByUsername(request.getEmail()) != null;
+
         if (loggedIn) {
             return ResponseEntity.ok("Zalogowano pomyślnie.");
         } else {

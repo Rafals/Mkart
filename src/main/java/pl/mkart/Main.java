@@ -1,61 +1,49 @@
-package pl.mkart.MKartApplication;
+package pl.mkart;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import pl.mkart.controller.StartController;
 
 import java.io.IOException;
 
 @SpringBootApplication
 public class Main extends Application {
 
-    public static Stage primaryStage;
     private static ConfigurableApplicationContext springContext;
 
     public static void main(String[] args) {
-        // Uruchamiamy Spring Boot w osobnym wątku, aby JavaFX działał równolegle
-        springContext = SpringApplication.run(Main.class, args);
         launch(args);
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        // Ustawiamy primaryStage tylko w momencie startu
-        primaryStage = stage;
+        springContext = SpringApplication.run(Main.class);
 
-        // Inicjalizacja JavaFX
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/StartView.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-
-        primaryStage.setTitle("M-Kart – System Rezerwacji");
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setScene(scene);
-
-        // Dodanie ikony
-        Image icon = new Image(getClass().getResourceAsStream("/images/logo.png"));
-        primaryStage.getIcons().add(icon);
-
-        primaryStage.show();
+        showStartView(stage);
     }
 
     // Metoda do wyświetlania startowego widoku
-    public static void showStartView() throws IOException {
+    public static void showStartView(Stage stage) throws IOException {
+
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/StartView.fxml"));
         Parent root = loader.load();
+
+        // Pobieramy kontroler i przekazujemy Stage
+        StartController controller = loader.getController();
+        controller.setStage(stage);
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setTitle("M-Kart – Start");
+        stage.setScene(scene);
+        stage.show();
     }
 
     // Metoda, aby zamknąć Spring Boot w momencie zamknięcia aplikacji
@@ -67,15 +55,16 @@ public class Main extends Application {
         }
     }
 
-    public static void showDashboardView() throws IOException {
+    public static void showDashboardView(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/DashboardView.fxml"));
         Parent root = loader.load();
 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        stage.setTitle("M-Kart – Dashboard");
+        stage.setScene(scene);
+        stage.show();
     }
 
 }
