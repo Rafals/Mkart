@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,6 +44,7 @@ public class Main extends Application {
 
         stage.setTitle("M-Kart – Start");
         stage.setScene(scene);
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
     }
 
@@ -64,6 +66,20 @@ public class Main extends Application {
 
         stage.setTitle("M-Kart – Dashboard");
         stage.setScene(scene);
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.show();
+    }
+
+    public static void showWelcomeView(Stage stage) throws IOException {
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/WelcomePage.fxml"));
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(Main.class.getResource("/css/style.css").toExternalForm());
+
+        stage.setTitle("M-Kart – Panel");
+        stage.setScene(scene);
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
     }
 

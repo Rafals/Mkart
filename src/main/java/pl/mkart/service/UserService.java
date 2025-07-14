@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.mkart.model.Role;
 import pl.mkart.model.User;
+import pl.mkart.repository.UserRepository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,16 +19,31 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder encoder;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    public boolean login(String username, String password) {
+        return userRepository.findByUsername(username)
+                .map(user -> encoder.matches(password, user.getPassword()))
+                .orElse(false);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        System.out.println("In the user details service.");
 
-        if (!username.equals("admin")) throw new UsernameNotFoundException(username);
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role(1, "USER"));
-
-        return new User(1, "admin", encoder.encode("admin1"), roles);
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword()) // zakładam że zakodowane
+                .authorities(
+                        user.getAuthorities()
+                                .stream()
+                                .map(role -> role.getAuthority())
+                                .toArray(String[]::new)
+                )
+                .build();
     }
 }

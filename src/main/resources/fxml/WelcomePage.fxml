@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pl.mkart.controller.WelcomeController"
+      styleClass="root"
+      spacing="20"
+      alignment="TOP_CENTER"
+      prefWidth="600" prefHeight="400"
+      style="-fx-background-color: #121212;">
+
+    <HBox fx:id="topBar"
+          style="-fx-background-color: black; -fx-padding: 0 10 0 10;"
+          stylesheets="@/css/style.css"
+          alignment="CENTER_LEFT"
+          prefHeight="40"
+          spacing="10">
+        <children>
+            <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                <image>
+                    <Image url="@/images/logo.png" />
+                </image>
+            </ImageView>
+            <Label text="M-Kart"
+                   style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+            <Button text="←"
+                    onAction="#goBackApp"
+                    styleClass="top-bar-button"
+            />
+            <Button text="✕"
+                    onAction="#closeApp"
+                    styleClass="top-bar-button"
+            />
+        </children>
+    </HBox>
+
+    <Label text="Witaj w panelu użytkownika Mkart !" styleClass="title-label" alignment="CENTER"/>
+    <Button fx:id="panelUzytkownika"
+            text="Panel użytkownika"
+            styleClass="main-button"/>
+
+</VBox>

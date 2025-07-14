@@ -1,15 +1,11 @@
 package pl.mkart.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import pl.mkart.Main;
 
 import java.io.IOException;
@@ -35,30 +31,30 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
-        String email = usernameField.getText();
+        String username = usernameField.getText();
         String password = passwordField.getText();
 
         // Sprawdzamy, czy dane są niepuste
-        if (email.isEmpty() || password.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty()) {
             errorLabel.setText("Wszystkie pola muszą być wypełnione.");
             errorLabel.setVisible(true);
             return;
         }
 
         // Wywołanie metody do logowania
-        loginUser(email, password);
+        loginUser(username, password);
     }
 
     // Metoda do wysyłania danych logowania do backendu
-    private void loginUser(String email, String password) {
+    private void loginUser(String username, String password) {
         HttpClient client = HttpClient.newHttpClient();
 
         // Tworzymy dane do wysłania w żądaniu (np. JSON)
-        String json = String.format("{\"email\":\"%s\", \"password\":\"%s\"}", email, password);
+        String json = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", username, password);
         System.out.println(json);
 
         String basicAuth = "Basic " + Base64.getEncoder()
-                .encodeToString((email + ":" + password).getBytes());
+                .encodeToString((username + ":" + password).getBytes());
 
         // Tworzymy zapytanie HTTP
         HttpRequest request = HttpRequest.newBuilder()
@@ -80,7 +76,7 @@ public class LoginController {
                         });
                     } else {
                         System.out.println(response.statusCode());
-                        System.out.println("login: " + email);
+                        System.out.println("login: " + username);
                         System.out.println("password: " + password);
                         // W przypadku błędu logowania wyświetlamy komunikat
                         Platform.runLater(() -> {
@@ -103,7 +99,7 @@ public class LoginController {
     private void handleLogout() {
         try{
             if (stage != null) {
-                Main.showStartView(stage);
+                Main.showWelcomeView(stage);
             } else System.out.println("stage is null");
         } catch (Exception e) {
             e.printStackTrace();
