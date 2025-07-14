@@ -19,8 +19,8 @@ Prosta aplikacja desktopowa do systemu rezerwacji toru gokartowego M-Kart. Obecn
 ## 📅 Plan
 
 ✅ Ekran powitalny  
-⬜ Ekran logowania  
-⬜ Integracja z REST API  
+✅ Ekran logowania  
+✅ Integracja z REST API  
 ⬜ Panel klienta i admina  
 ⬜ Obsługa rezerwacji
 
